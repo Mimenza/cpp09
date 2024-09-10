@@ -6,7 +6,7 @@
 /*   By: emimenza <emimenza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 13:57:47 by emimenza          #+#    #+#             */
-/*   Updated: 2024/09/10 15:56:35 by emimenza         ###   ########.fr       */
+/*   Updated: 2024/09/10 17:39:33 by emimenza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include <climits>
 # include <deque>
 # include <algorithm>
+# include <ctime> 
 
 class PmergeM
 {

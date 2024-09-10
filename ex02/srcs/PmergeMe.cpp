@@ -6,7 +6,7 @@
 /*   By: emimenza <emimenza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 13:57:45 by emimenza          #+#    #+#             */
-/*   Updated: 2024/09/10 17:32:20 by emimenza         ###   ########.fr       */
+/*   Updated: 2024/09/10 18:05:39 by emimenza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,24 +31,6 @@ bool isValid(char * str)
     return (*endptr == '\0' && value >= 0 && value <= INT_MAX);
 }
 
-// void sortPairs(std::deque<int> *nbrDeque)
-// {
-//     for (std::deque<int>::iterator it = (*nbrDeque).begin(); it != (*nbrDeque).end(); )
-//     {
-//         std::deque<int>::iterator nextIt = it;
-//         ++nextIt;
-//         if (nextIt != (*nbrDeque).end())
-//         {
-//             if (*it > *nextIt)
-//             {
-//                 std::swap(*it, *nextIt);
-//             }
-//             it = nextIt;
-//         }
-//         ++it;
-//     }
-// }
-
 void insertionSort(std::deque<int> &sublist)
 {
 
@@ -71,6 +53,22 @@ std::deque<int> merge(const std::deque<int> &left, const std::deque<int> &right)
     std::deque<int>::const_iterator leftIt = left.begin();
     std::deque<int>::const_iterator rightIt = right.begin();
 
+    // std::cout << "merge left content:" << std::endl;
+    // std::deque<int>::const_iterator it;
+    // for (it = left.begin(); it != left.end(); ++it)
+    // {
+    //     std::cout << *it << " ";
+    // }
+    // std::cout << std::endl;
+    // std::cout << "merge right content:" << std::endl;
+    // for (it = right.begin(); it != right.end(); ++it)
+    // {
+    //     std::cout << *it << " ";
+    // }
+    // std::cout << std::endl;
+    // std::cout << std::endl;
+    // std::cout << std::endl;
+    
     while (leftIt != left.end() && rightIt != right.end())
     {
         if (*leftIt <= *rightIt)
@@ -88,6 +86,15 @@ std::deque<int> merge(const std::deque<int> &left, const std::deque<int> &right)
     result.insert(result.end(), leftIt, left.end());
     result.insert(result.end(), rightIt, right.end());
 
+    // std::cout << "after mergin" << std::endl;
+    // for (it = result.begin(); it != result.end(); ++it)
+    // {
+    //     std::cout << *it << " ";
+    // }
+    // std::cout << std::endl;
+    // std::cout << std::endl;
+    // std::cout << std::endl;
+    
     return result;
 }
 
@@ -95,7 +102,7 @@ void mergeInsertSort(std::deque<int> &deque)
 {
     // Print
     //std::cout << "Start content:" << std::endl;
-    // std::deque<int>::iterator it;
+    std::deque<int>::iterator it;
     // for (it = deque.begin(); it != deque.end(); ++it)
     // {
     //     std::cout << *it << " ";
@@ -107,6 +114,7 @@ void mergeInsertSort(std::deque<int> &deque)
     if (deque.size() == 1){}
     else if(deque.size() == 2)
     {
+        //sort 2 elements
         insertionSort(deque);
     }
     else
@@ -121,6 +129,7 @@ void mergeInsertSort(std::deque<int> &deque)
         // std::cout << std::endl;
 
         std::deque<int> right(deque.begin() + 2, deque.end());
+        
         // std::cout << "right content:" << std::endl;
         // for (it = right.begin(); it != right.end(); ++it)
         // {
@@ -148,7 +157,8 @@ void mergeInsertSort(std::deque<int> &deque)
 void PmergeM::process(char **argv) throw(std::invalid_argument, std::runtime_error)
 {
     std::deque<int> nbrDeque;
-
+    
+	clock_t start = clock();
     while (*argv)
     {
         if (isValid((*argv)) == false)
@@ -160,15 +170,24 @@ void PmergeM::process(char **argv) throw(std::invalid_argument, std::runtime_err
         argv++;
     }
 
-    //sortPairs(&nbrDeque);
+    
+    std::cout << "Before ";
+    for (std::deque<int>::iterator it = nbrDeque.begin(); it != nbrDeque.end(); ++it)
+    {
+        std::cout << *it << " ";
+    }
+    std::cout << std::endl;
     
     mergeInsertSort(nbrDeque);
-    //Print
+
+    clock_t end = clock();
+    double elapsed = double(end - start) / CLOCKS_PER_SEC;
+    std::cout << "After  ";
     for (std::deque<int>::iterator it = nbrDeque.begin(); it != nbrDeque.end(); ++it)
     {
         std::cout << *it << " ";
     }
     std::cout << std::endl;
 
-    
+    std::cout << "Time to process a range of " << nbrDeque.size()  << " elements with std::deque<int> :"  << elapsed * 10 << " us" << std::endl;
 }
