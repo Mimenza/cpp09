@@ -6,11 +6,13 @@
 /*   By: emimenza <emimenza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 13:57:45 by emimenza          #+#    #+#             */
-/*   Updated: 2024/09/10 18:05:39 by emimenza         ###   ########.fr       */
+/*   Updated: 2024/09/10 21:15:39 by emimenza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/PmergeMe.hpp"
+
+const int K = 5;
 
 PmergeM::PmergeM(void) { return; }
 
@@ -19,6 +21,15 @@ PmergeM::PmergeM(PmergeM const &) { return; }
 PmergeM::~PmergeM(void) { return; }
 
 PmergeM PmergeM::operator=(PmergeM const &) { return (*this); }
+
+void printDeque(std::deque<int>& nbrDeque, int start, int size)
+{
+    for (int i = start; i < size; i++)
+    {
+        std::cout << nbrDeque[i] << " ";
+    }
+    std::cout << std::endl;
+}
 
 bool isValid(char * str)
 {
@@ -31,127 +42,70 @@ bool isValid(char * str)
     return (*endptr == '\0' && value >= 0 && value <= INT_MAX);
 }
 
-void insertionSort(std::deque<int> &sublist)
+// Función para el Insertion Sort usando deque
+void insertionSort(std::deque<int>& A, int start, int end)
 {
+    for (int i = start; i < end; i++) {
+        int tempVal = A[i + 1];
+        int j = i + 1;
 
-    std::deque<int>::iterator it = sublist.begin();
-    if (it != sublist.end())
-    {
-        std::deque<int>::iterator nextIt = it;
-        ++nextIt;
-        if (*it > *nextIt)
-        {
-            std::swap(*it, *nextIt);
+        while (j > start && A[j - 1] > tempVal) {
+            A[j] = A[j - 1];
+            j--;
         }
-        it = nextIt;
+        A[j] = tempVal;
     }
 }
 
-std::deque<int> merge(const std::deque<int> &left, const std::deque<int> &right)
+// Función para el Merge usando deque
+void merge(std::deque<int>& A, int leftStart, int leftEnd, int rightEnd)
 {
-    std::deque<int> result;
-    std::deque<int>::const_iterator leftIt = left.begin();
-    std::deque<int>::const_iterator rightIt = right.begin();
+    int sizeLeft = leftEnd - leftStart + 1;
+    int sizeRight = rightEnd - leftEnd;
 
-    // std::cout << "merge left content:" << std::endl;
-    // std::deque<int>::const_iterator it;
-    // for (it = left.begin(); it != left.end(); ++it)
-    // {
-    //     std::cout << *it << " ";
-    // }
-    // std::cout << std::endl;
-    // std::cout << "merge right content:" << std::endl;
-    // for (it = right.begin(); it != right.end(); ++it)
-    // {
-    //     std::cout << *it << " ";
-    // }
-    // std::cout << std::endl;
-    // std::cout << std::endl;
-    // std::cout << std::endl;
-    
-    while (leftIt != left.end() && rightIt != right.end())
+    std::deque<int> LA(sizeLeft);
+    std::deque<int> RA(sizeRight);
+
+    std::copy(A.begin() + leftStart, A.begin() + leftEnd + 1, LA.begin());
+    std::copy(A.begin() + leftEnd + 1, A.begin() + rightEnd + 1, RA.begin());
+
+    int LI = 0, RI = 0;
+
+    for (int i = leftStart; i <= rightEnd; i++)
     {
-        if (*leftIt <= *rightIt)
+        if (RI == sizeRight)
         {
-            result.push_back(*leftIt);
-            ++leftIt;
+            A[i] = LA[LI++];
+        }
+        else if (LI == sizeLeft)
+        {
+            A[i] = RA[RI++];
+        }
+        else if (RA[RI] > LA[LI])
+        {
+            A[i] = LA[LI++];
         }
         else
         {
-            result.push_back(*rightIt);
-            ++rightIt;
+            A[i] = RA[RI++];
         }
     }
-
-    result.insert(result.end(), leftIt, left.end());
-    result.insert(result.end(), rightIt, right.end());
-
-    // std::cout << "after mergin" << std::endl;
-    // for (it = result.begin(); it != result.end(); ++it)
-    // {
-    //     std::cout << *it << " ";
-    // }
-    // std::cout << std::endl;
-    // std::cout << std::endl;
-    // std::cout << std::endl;
-    
-    return result;
 }
 
-void mergeInsertSort(std::deque<int> &deque)
+// Función para ordenar (mezcla o inserción) usando deque
+void sort(std::deque<int>& A, int start, int end)
 {
-    // Print
-    //std::cout << "Start content:" << std::endl;
-    std::deque<int>::iterator it;
-    // for (it = deque.begin(); it != deque.end(); ++it)
-    // {
-    //     std::cout << *it << " ";
-    // }
-    // std::cout << std::endl;
-    // std::cout << std::endl;
-    // std::cout << std::endl;
-    
-    if (deque.size() == 1){}
-    else if(deque.size() == 2)
+    if (end - start > K)
     {
-        //sort 2 elements
-        insertionSort(deque);
+        int mid = start + (end - start) / 2;
+        sort(A, start, mid);
+        sort(A, mid + 1, end);
+        merge(A, start, mid, end);
     }
     else
     {
-        std::deque<int> left(deque.begin(), deque.begin() + 2);
-
-        // std::cout << "left content:" << std::endl;
-        // for (it = left.begin(); it != left.end(); ++it)
-        // {
-        //     std::cout << *it << " ";
-        // }
-        // std::cout << std::endl;
-
-        std::deque<int> right(deque.begin() + 2, deque.end());
-        
-        // std::cout << "right content:" << std::endl;
-        // for (it = right.begin(); it != right.end(); ++it)
-        // {
-        //     std::cout << *it << " ";
-        // }
-        // std::cout << std::endl;
-        // std::cout << std::endl;
-
-        mergeInsertSort(left);
-        mergeInsertSort(right);
-
-        deque = merge(left, right);
+        insertionSort(A, start, end);
     }
-
-    // std::cout << "End content:" << std::endl;
-    // for (it = deque.begin(); it != deque.end(); ++it)
-    // {
-    //     std::cout << *it << " ";
-    // }
-    // std::cout << std::endl;
-    // std::cout << std::endl;
-    // std::cout << std::endl;
 }
 
 void PmergeM::process(char **argv) throw(std::invalid_argument, std::runtime_error)
@@ -172,22 +126,16 @@ void PmergeM::process(char **argv) throw(std::invalid_argument, std::runtime_err
 
     
     std::cout << "Before ";
-    for (std::deque<int>::iterator it = nbrDeque.begin(); it != nbrDeque.end(); ++it)
-    {
-        std::cout << *it << " ";
-    }
-    std::cout << std::endl;
+    printDeque(nbrDeque, 0, nbrDeque.size());
     
-    mergeInsertSort(nbrDeque);
+    //mergeInsertSort(nbrDeque);
+    sort(nbrDeque, 0, nbrDeque.size() - 1);
 
     clock_t end = clock();
     double elapsed = double(end - start) / CLOCKS_PER_SEC;
+    
     std::cout << "After  ";
-    for (std::deque<int>::iterator it = nbrDeque.begin(); it != nbrDeque.end(); ++it)
-    {
-        std::cout << *it << " ";
-    }
-    std::cout << std::endl;
+    printDeque(nbrDeque, 0, nbrDeque.size());
 
     std::cout << "Time to process a range of " << nbrDeque.size()  << " elements with std::deque<int> :"  << elapsed * 10 << " us" << std::endl;
 }

@@ -6,11 +6,12 @@
 /*   By: emimenza <emimenza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 13:50:09 by emimenza          #+#    #+#             */
-/*   Updated: 2024/09/10 18:04:51 by emimenza         ###   ########.fr       */
+/*   Updated: 2024/09/10 20:47:03 by emimenza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "incs/PmergeMe.hpp"
+
 //std::contenedor<tipo de dato>::iterator nombre;
 
 int main(int argc, char **argv)
@@ -23,6 +24,7 @@ int main(int argc, char **argv)
 
 	try
 	{
+		//(void)argv;
 		PmergeM::process(++argv);
 	}
 	catch (std::exception const &e)

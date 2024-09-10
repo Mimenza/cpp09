@@ -6,12 +6,13 @@
 #    By: emimenza <emimenza@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/10 13:50:11 by emimenza          #+#    #+#              #
-#    Updated: 2024/09/10 14:15:08 by emimenza         ###   ########.fr        #
+#    Updated: 2024/09/10 20:52:08 by emimenza         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-CC = c++
-CFLAGS = -Wall -Wextra -Werror -std=c++98 
+#CC = c++
+CC = g++
+CFLAGS = -Wall -Wextra -Werror -std=c++98  -g
 RM = rm -rf
 NAME = PmergeMe
 
