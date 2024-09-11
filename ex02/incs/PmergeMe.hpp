@@ -17,6 +17,7 @@
 # include <cstdlib>
 # include <climits>
 # include <deque>
+# include <vector>
 # include <algorithm>
 # include <ctime> 
 
