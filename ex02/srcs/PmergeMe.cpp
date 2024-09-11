@@ -138,10 +138,9 @@ void PmergeM::process(char **argv) throw(std::invalid_argument, std::runtime_err
     double timeVector = sort(nbrVector, 0, nbrVector.size() - 1);
 
     std::cout << "After  ";
-    printContainer(nbrVector, 0, nbrVector.size());
+    printContainer(nbrDeque,0, nbrDeque.size());
 
     std::cout << std::fixed << std::setprecision(6);
-
     std::cout << "Time to process a range of " << nbrDeque.size()  << " elements with std::deque<int> :  "  << timeDeque << " us" << std::endl;
     std::cout << "Time to process a range of " << nbrVector.size()  << " elements with std::vector<int> : "  << timeVector << " us" << std::endl;
 }
