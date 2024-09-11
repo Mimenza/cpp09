@@ -20,7 +20,45 @@ BitcoinExchange::BitcoinExchange(const std::string& csvFilePath)
     // }
 }
 
+std::string currentDate()
+{
+    std::time_t t = std::time(NULL);
+    std::tm* now = std::localtime(&t);
 
+    char buffer[11];
+
+    std::sprintf(buffer, "%04d-%02d-%02d", now->tm_year + 1900, now->tm_mon + 1, now->tm_mday);
+
+    return std::string(buffer);
+}
+
+bool checkDateExpiration(int year, int month, int day)
+{
+    const std::string date= currentDate();
+    int cYear = std::atoi(date.substr(0, 4).c_str());
+    int cMonth = std::atoi(date.substr(5, 2).c_str());
+    int cDay = std::atoi(date.substr(8, 2).c_str());
+
+    if (year > cYear)
+    {
+        return false;
+    }
+    else if (year == cYear)
+        {
+        if (month > cMonth)
+        {
+            return false;
+        }
+        else if (month == cMonth)
+            {
+            if (day > cDay)
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
 void BitcoinExchange::loadCSVData(const std::string& csvFilePath)
 {
     //check File and load the info into the map
@@ -78,7 +116,7 @@ void BitcoinExchange::processInputFile(int argc, char **argv)
     {
        processLine(line);
     }
-    
+
     file.close();
 }
 
@@ -148,6 +186,9 @@ void BitcoinExchange::isValidDate(const std::string& date) const
     {
         throw ParsingException();
     }
+
+    if (checkDateExpiration(year, month, day) == false)
+        throw ParsingException();
 }
 
 
@@ -221,25 +262,6 @@ void BitcoinExchange::isValidValue(const std::string& value) const
     }
 }
 
-
-
-// void BitcoinExchange::getExchangeRate(const std::string& date, const std::string &value) const
-// {
-//     std::map<std::string, double>::const_iterator it = historicalPrices.find(date);
-    
-//     if (it != historicalPrices.end())
-//     {
-//         std::cout << it->first << " => " << it->second << " = " << value << std::endl;
-//     }
-//     else
-//     {
-//         it = historicalPrices.lower_bound(date);
-//         if (it != historicalPrices.end())
-//         {
-//             std::cout << it->first << " => " << it->second << " = " << value << std::endl;
-//         }
-//     }
-// }
 
 void BitcoinExchange::getExchangeRate(const std::string& date, const std::string& value) const {
     // Convertir value a double

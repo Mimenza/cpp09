@@ -17,12 +17,13 @@
 # include <fstream>
 # include <map>
 # include <algorithm>
-
-#include <cctype>  // For isdigit
-#include <cstdlib> // For atof
-#include <climits> // For INT_MIN, INT_MAX
-#include <cfloat>  // For float/double limits
-#include <sstream> // Para std::stringstream
+# include <cctype>  // For isdigit
+# include <cstdlib> // For atof
+# include <climits> // For INT_MIN, INT_MAX
+# include <cfloat>  // For float/double limits
+# include <sstream> // Para std::stringstream
+# include <cstdio>
+# include <ctime>
 
 class ArgumentsException : public std::exception {
 public:
