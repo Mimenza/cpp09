@@ -6,7 +6,7 @@
 /*   By: emimenza <emimenza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 12:35:56 by emimenza          #+#    #+#             */
-/*   Updated: 2024/09/05 16:01:57 by emimenza         ###   ########.fr       */
+/*   Updated: 2024/10/14 16:38:54 by emimenza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@
 class ArgumentsException : public std::exception {
 public:
     const char* what() const throw() {
-        return "Error: must have only 1 arg.";
+        return "Error: must have 1 arg.";
     }
 };
 
@@ -87,8 +87,10 @@ class BitcoinExchange {
     private:
         void loadCSVData(const std::string& csvFilePath);
         void processLine(const std::string& line);
-        void isValidDate(const std::string& date) const;
-        void isValidValue(const std::string& value) const;
+
+        bool isValidDate(const std::string& date) const;
+        bool isValidValue(const std::string& value, int mode) const;
+        
         void getExchangeRate(const std::string& date, const std::string &value) const;
 
         std::map<std::string, double> historicalPrices;

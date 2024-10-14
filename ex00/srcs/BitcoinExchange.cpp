@@ -6,7 +6,7 @@
 /*   By: emimenza <emimenza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 15:09:17 by emimenza          #+#    #+#             */
-/*   Updated: 2024/09/05 17:00:46 by emimenza         ###   ########.fr       */
+/*   Updated: 2024/10/14 16:42:18 by emimenza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 BitcoinExchange::BitcoinExchange(const std::string& csvFilePath)
 {
     loadCSVData(csvFilePath);
-
     // for (std::map<std::string, double>::const_iterator it = historicalPrices.begin(); it != historicalPrices.end(); ++it) {
     //     std::cout << "Fecha: " << it->first << ", Precio: " << it->second << std::endl;
     // }
@@ -59,13 +58,15 @@ bool checkDateExpiration(int year, int month, int day)
     }
     return true;
 }
+
+
 void BitcoinExchange::loadCSVData(const std::string& csvFilePath)
 {
     //check File and load the info into the map
-    (void)csvFilePath;
+    //(void)csvFilePath;
     std::ifstream file;
     
-    file.open("data.csv");
+    file.open(csvFilePath.c_str());
     
     if (!file)
        throw FileException();
@@ -79,7 +80,7 @@ void BitcoinExchange::loadCSVData(const std::string& csvFilePath)
         std::string numberStr = line.substr(11);
 
         isValidDate(dateStr);
-        isValidValue(numberStr);
+        isValidValue(numberStr, 0);
         
         //conver to double
         std::stringstream ss(numberStr);
@@ -100,18 +101,18 @@ void BitcoinExchange::loadCSVData(const std::string& csvFilePath)
 
 void BitcoinExchange::processInputFile(int argc, char **argv)
 {
-    std::ifstream file;
-    
     if (argc != 2)
         throw ArgumentsException();
 
-    file.open(argv[1]);
-
-    if (!file)
+    std::ifstream file(argv[1]);
+    
+    if (!file.is_open())
        throw FileException();
       
-        
+   
     std::string line;
+    std::getline(file, line);
+
     while (std::getline(file, line))
     {
        processLine(line);
@@ -126,16 +127,25 @@ void BitcoinExchange::processLine(const std::string& line)
     size_t separatorPos = line.find(" | ");
     if (separatorPos == std::string::npos)
     {
-        throw ParsingException();
+        // Error: missing separator
+        std::cout << "Error: bad input. '|' not found in line: " << line << std::endl;
+        return;  // Continue with the next line
     }
 
     std::string dateStr = line.substr(0, separatorPos);
     std::string numberStr = line.substr(separatorPos + 3);
 
-    isValidDate(dateStr);
-    isValidValue(numberStr);
-    
-    //std::cout << "date: " << dateStr << " value: " << numberStr << std::endl;
+    if (!isValidDate(dateStr))
+    {
+        std::cout << "Error: invalid date: " << dateStr << std::endl;
+        return;  // Continue with the next line
+    }
+
+    if (!isValidValue(numberStr, 1))
+    {
+        //std::cout << "Error: invalid value: " << numberStr << std::endl;
+        return;  // Continue with the next line
+    }
     
     getExchangeRate(dateStr, numberStr);
 }
@@ -147,48 +157,45 @@ bool isLeapYear(int year)
 }
 
 
-void BitcoinExchange::isValidDate(const std::string& date) const
+bool BitcoinExchange::isValidDate(const std::string& date) const
 {
-    // Check if the string length is exactly 10 characters: YYYY-MM-DD
     if (date.size() != 10)
     {
-        throw ParsingException();
+        return false;
     }
-
-    // Check if the format is "XXXX-XX-XX", i.e., hyphens at positions 4 and 7
+    
     if (date[4] != '-' || date[7] != '-')
     {
-        throw ParsingException();
+        return false;
     }
+    
+    int year = std::atoi(date.substr(0, 4).c_str());
+    int month = std::atoi(date.substr(5, 2).c_str());
+    int day = std::atoi(date.substr(8, 2).c_str());
 
-    // Extract year, month, and day using substr and convert to integers
-    int year = std::atoi(date.substr(0, 4).c_str());   // YYYY
-    int month = std::atoi(date.substr(5, 2).c_str());  // MM
-    int day = std::atoi(date.substr(8, 2).c_str());    // DD
-
-    // Validate month and day ranges
     if (month < 1 || month > 12)
     {
-        throw ParsingException();
+        return false;
     }
-
-    // Array with the maximum number of days for each month
+    
     int daysInMonth[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-    // Adjust February for leap years
     if (month == 2 && isLeapYear(year))
     {
         daysInMonth[1] = 29;
     }
 
-    // Check if the day is within the allowed range for the given month
     if (day < 1 || day > daysInMonth[month - 1])
     {
-        throw ParsingException();
+        return false;
+    }
+    
+    if (!checkDateExpiration(year, month, day))
+    {
+        return false;
     }
 
-    if (checkDateExpiration(year, month, day) == false)
-        throw ParsingException();
+    return true;
 }
 
 
@@ -237,29 +244,29 @@ bool isNumeric(const std::string& str)
 }
 
 
-void BitcoinExchange::isValidValue(const std::string& value) const
+bool BitcoinExchange::isValidValue(const std::string& value, int mode) const
 {
     if (isNumeric(value))
     {
-        // Convert string to double (to handle both integers and floats)
-        double number = atof(value.c_str());
+        float number = atof(value.c_str());
 
-        // Check if the number is within float limits
-        if (number >= FLT_MAX)
+        if (number >= 1000 && mode == 1)
         {
-            //large
-            throw largeException();
+            std::cout << "Error: value too large: " << value << std::endl;
+            return false;
         } 
         else if (number < 0)
         {
-            //low
-            throw lowException();
+            std::cout << "Error: value is not positive: " << value << std::endl;
+            return false;
         }
     }
     else 
     {
-        throw ParsingException();
+        return false;
     }
+
+    return true;
 }
 
 
@@ -291,8 +298,8 @@ void BitcoinExchange::getExchangeRate(const std::string& date, const std::string
     }
 }
 
-
 //------------------------------------------------------------------
+
 BitcoinExchange::BitcoinExchange() {}
 
 BitcoinExchange::BitcoinExchange(const BitcoinExchange& other)
